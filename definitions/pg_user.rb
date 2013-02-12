@@ -39,8 +39,6 @@ define :pg_user,
                              "WITH PASSWORD '#{params[:password]}';\""
                          end
 
-  Chef::Log.info("Setting password command #{set_password_command}")
-
 
   bash "create_user-#{username}-#{port}" do
     user "postgres"
