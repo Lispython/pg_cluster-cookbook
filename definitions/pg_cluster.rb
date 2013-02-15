@@ -100,6 +100,22 @@ define :pg_cluster,
     action :stop
   end
 
+
+  # Default PostgreSQL install has 'ident' checking on unix user 'postgres'
+  # and 'md5' password checking with connections from 'localhost'. This script
+  # runs as user 'postgres', so we can execute the 'role' and 'database' resources
+  # as 'root' later on, passing the below credentials in the PG client.
+  assign_postgres_password = bash "assign-postgres-password-#{params[:name]}-#{params[:port]}" do
+    user 'postgres'
+    code <<-EOH
+echo "ALTER ROLE postgres ENCRYPTED PASSWORD '#{params[:config][:password][:postgres]}';" | psql -h #{node[:postgresql][:data_run]} -p #{params[:port]}
+  EOH
+    #only_if 'pg_lsclusters -h | awk -F" " \'{ print $1 $2 }\' | grep "#{params[:name]}" | grep "#{version}"'
+    only_if "invoke-rc.d postgresql status | grep #{params[:name]}" # make sure server is actually running
+    not_if "echo '\\connect' | PGPASSWORD=#{params[:config]['password']['postgres']} psql --username=postgres --no-password  -h #{node[:postgresql][:data_run]} -p #{params[:port]} "
+    action :nothing
+  end
+
   template "#{config_file}" do
     source "postgresql.conf.erb"
     owner "postgres"
@@ -116,6 +132,7 @@ define :pg_cluster,
               :data_run => data_run)
     action :create
     notifies :restart, "service[postgresql-#{version}]", :immediately
+    notifies :run, "bash[assign-postgres-password-#{params[:name]}-#{params[:port]}]", :immediately
   end
 
   if config["authentication"][:ssl] == 'true' &&
@@ -166,20 +183,6 @@ define :pg_cluster,
 
   end
 
-  # Default PostgreSQL install has 'ident' checking on unix user 'postgres'
-  # and 'md5' password checking with connections from 'localhost'. This script
-  # runs as user 'postgres', so we can execute the 'role' and 'database' resources
-  # as 'root' later on, passing the below credentials in the PG client.
-  bash "assign-postgres-password-#{params[:name]}-#{params[:port]}" do
-    user 'postgres'
-    code <<-EOH
-echo "ALTER ROLE postgres ENCRYPTED PASSWORD '#{params[:config][:password][:postgres]}';" | psql -h #{node[:postgresql][:data_run]} -p #{params[:port]}
-  EOH
-    #only_if 'pg_lsclusters -h | awk -F" " \'{ print $1 $2 }\' | grep "#{params[:name]}" | grep "#{version}"'
-    only_if "invoke-rc.d postgresql status | grep #{params[:name]}" # make sure server is actually running
-    not_if "echo '\\connect' | PGPASSWORD=#{params[:config]['password']['postgres']} psql --username=postgres --no-password  -h #{node[:postgresql][:data_run]} -p #{params[:port]} "
-    action :run
-  end
 
   template hba_file do
     source "pg_hba.conf.erb"
@@ -195,5 +198,9 @@ echo "ALTER ROLE postgres ENCRYPTED PASSWORD '#{params[:config][:password][:post
       ::File.exist?("#{config_file}")
     end
     notifies :restart, "service[postgresql-#{version}]", :immediately
+  end
+
+  service "postgresql-#{version}" do
+    action :restart
   end
 end

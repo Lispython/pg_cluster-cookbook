@@ -76,10 +76,10 @@ default[:postgresql]["config"] = {
   "client_connection" => {
     "datestyle" => "iso, mdy",
     "timezone" => "localtime",
-    "lc_messages" => "en_US",
-    "lc_monetary" => "en_US",
-    "lc_numeric" => "en_US",
-    "lc_time" => "en_US",
+    "lc_messages" => "en_US.UTF-8",
+    "lc_monetary" => "en_US.UTF-8",
+    "lc_numeric" => "en_US.UTF-8",
+    "lc_time" => "en_US.UTF-8",
     "default_text_search_config" => "pg_catalog.english"
   },
   "lock_management" => {},
