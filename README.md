@@ -230,8 +230,8 @@ clusters, users and databases will be created automatical from node cluster attr
                       #:provider => "postgresql_pg_apt",
                       :version => "8.4", # postgresql version to install
                       :databag => "postgresql", # databag from which items are fetched
-                      :clusters => {
-                        "main" => {
+                      :clusters => [
+                          :name => "main",
                           :version => "8.4", # cluster version
                           :port => 5434, # cluster port
                           :hba => [ # main hba configuration
@@ -248,7 +248,7 @@ clusters, users and databases will be created automatical from node cluster attr
 			     "shared_buffers" => "24MB"
 			  }
                         }
-                      },
+                      ],
                       "extra_packages" => ["postgresql-8.4-postgis", "postgresql-contrib-8.4",
                                            "postgresql-doc-8.4", "postgresql-plpython-8.4",
                                            "postgresql-server-dev-8.4"]
