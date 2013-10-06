@@ -67,6 +67,7 @@ node["postgresql"]["clusters"].each() do |cluster_config|
         locale db['locale']
         host cluster_config["host"]
         port cluster_config["port"]
+        execute db['execute']
       end
     end
 

@@ -17,7 +17,8 @@ define :pg_database,
        :template => "template0",
        :encoding => "UTF-8",
        :host => nil,
-       :port => nil do
+       :port => nil,
+       :execute => nil do
 
   port = params[:port]
 
@@ -30,7 +31,21 @@ define :pg_database,
     user "root"
     code <<-EOH
         #{create_database_command}
-      EOH
+    EOH
     not_if "sudo -u postgres psql -l -h #{node[:postgresql][:data_run]} -p #{port} | grep #{params[:name]}"
+  end
+
+
+  if params[:execute]
+    Chef::Log.info("Executeg sql commands")
+
+    execute_command = 'echo "#{execute_command}" | sudo -u postgres psql -h #{node[:postgresql][:data_run]} -p #{port} #{params[:name]}'
+
+    bash "execute_custom_command-#{params[:name]}-#{port}" do
+      user "root"
+      code <<-EOH
+         #{execute_command}
+      EOH
+    end
   end
 end
