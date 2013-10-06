@@ -22,30 +22,28 @@ define :pg_database,
 
   port = params[:port]
 
-  create_database_command = "sudo -u postgres createdb -h #{node[:postgresql][:data_run]} -p #{port} -E #{params[:encoding]} -O #{params[:owner]} " +
+  create_database_command = "sudo -u postgres createdb -h #{node[:postgresql][:data_run]} -p #{params[:port]} -E #{params[:encoding]} -O #{params[:owner]} " +
     "--locale #{params[:locale]} -T #{params[:template]} #{params[:name]}"
 
   Chef::Log.info("Creating database by command #{create_database_command}")
 
-  bash "create_database-#{params[:name]}-#{port}" do
+  bash "create_database-#{params[:name]}-#{params[:port]}" do
     user "root"
     code <<-EOH
         #{create_database_command}
     EOH
-    not_if "sudo -u postgres psql -l -h #{node[:postgresql][:data_run]} -p #{port} | grep #{params[:name]}"
+    not_if "sudo -u postgres psql -l -h #{node[:postgresql][:data_run]} -p #{params[:port]} | grep #{params[:name]}"
   end
 
 
   if params[:execute]
-    Chef::Log.info("Executeg sql commands")
 
-    execute_command = 'echo "#{execute_command}" | sudo -u postgres psql -h #{node[:postgresql][:data_run]} -p #{port} #{params[:name]}'
+    execute_command = "echo '#{execute_command}' | sudo -u postgres psql -h #{node[:postgresql][:data_run]} -p #{params[:port]} #{params[:name]}"
+    Chef::Log.info("Execute sql commands: #{execute_command}")
 
-    bash "execute_custom_command-#{params[:name]}-#{port}" do
+    bash "execute_custom_command-#{params[:name]}-#{params[:port]}" do
       user "root"
-      code <<-EOH
-         #{execute_command}
-      EOH
+      code "#{execute_command}"
     end
   end
 end
