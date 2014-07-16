@@ -112,7 +112,7 @@ echo "ALTER ROLE postgres ENCRYPTED PASSWORD '#{params[:config][:password][:post
   EOH
     #only_if 'pg_lsclusters -h | awk -F" " \'{ print $1 $2 }\' | grep "#{params[:name]}" | grep "#{version}"'
     only_if "invoke-rc.d postgresql status | grep #{params[:name]}" # make sure server is actually running
-    not_if "echo '\\connect' | PGPASSWORD=#{params[:config]['password']['postgres']} psql --username=postgres --no-password  -h #{node[:postgresql][:data_run]} -p #{params[:port]} "
+    not_if "echo '\\connect' | PGPASSWORD=#{params[:config][:password][:postgres]} psql --username=postgres --no-password  -h #{node[:postgresql][:data_run]} -p #{params[:port]} "
     action :nothing
   end
 
