@@ -11,7 +11,7 @@ define :pg_database_extensions, action: :create do  # ~FC022
     languages.each do |language|
       execute "createlang #{language} #{dbname}" do
         user "postgres"
-        not_if "psql -u postgres psql -h #{node[:postgresql][:data_run]} -p #{params[:port]} -c 'SELECT lanname FROM pg_catalog.pg_language' #{dbname} | grep '^ #{language}$'", user: "postgres" # rubocop:disable LineLength
+        not_if "psql -h #{node[:postgresql][:data_run]} -p #{params[:port]} -c 'SELECT lanname FROM pg_catalog.pg_language' #{dbname} | grep '^ #{language}$'", user: "postgres" # rubocop:disable LineLength
       end
     end
 
@@ -20,7 +20,7 @@ define :pg_database_extensions, action: :create do  # ~FC022
       extension = %("#{extension}") if extension.match("-")
 
       execute "create #{extension} extension" do
-        command %(psql -u postgres psql -h #{node[:postgresql][:data_run]} -p #{params[:port]} -c 'CREATE EXTENSION IF NOT EXISTS #{extension}' #{dbname}) # rubocop:disable LineLength
+        command %(psql -h #{node[:postgresql][:data_run]} -p #{params[:port]} -c 'CREATE EXTENSION IF NOT EXISTS #{extension}' #{dbname}) # rubocop:disable LineLength
         user "postgres"
       end
     end
@@ -30,7 +30,7 @@ define :pg_database_extensions, action: :create do  # ~FC022
 
       %w[postgis postgis_topology].each do |ext|
         execute "create #{ext} extension" do
-          command %(psql -u postgres psql -h #{node[:postgresql][:data_run]} -p #{params[:port]} -c "CREATE EXTENSION IF NOT EXISTS #{ext}" #{dbname})
+          command %(psql -h #{node[:postgresql][:data_run]} -p #{params[:port]} -c "CREATE EXTENSION IF NOT EXISTS #{ext}" #{dbname})
           user "postgres"
         end
       end
@@ -41,7 +41,7 @@ define :pg_database_extensions, action: :create do  # ~FC022
     languages.each do |language|
       execute "droplang #{language} #{dbname}" do
         user "postgres"
-        only_if "psql -u postgres psql -h #{node[:postgresql][:data_run]} -p #{params[:port]} -c 'SELECT lanname FROM pg_catalog.pg_language' #{dbname} | grep '^ #{language}$'", user: "postgres" # rubocop:disable LineLength
+        only_if "psql -h #{node[:postgresql][:data_run]} -p #{params[:port]} -c 'SELECT lanname FROM pg_catalog.pg_language' #{dbname} | grep '^ #{language}$'", user: "postgres" # rubocop:disable LineLength
       end
     end
 
@@ -50,7 +50,7 @@ define :pg_database_extensions, action: :create do  # ~FC022
       extension = %("#{extension}") if extension.match("-")
 
       execute "drop #{extension} extension" do
-        command %(psql -u postgres psql -h #{node[:postgresql][:data_run]} -p #{params[:port]} -c 'DROP EXTENSION IF EXISTS #{extension}' #{dbname})
+        command %(psql -h #{node[:postgresql][:data_run]} -p #{params[:port]} -c 'DROP EXTENSION IF EXISTS #{extension}' #{dbname})
         user "postgres"
       end
     end
@@ -58,7 +58,7 @@ define :pg_database_extensions, action: :create do  # ~FC022
     if postgis
       %w[postgis postgis_topology].each do |ext|
         execute "drop #{ext} extension" do
-          command %(psql -u postgres psql -h #{node[:postgresql][:data_run]} -p #{params[:port]} -c "DROP EXTENSION IF EXISTS #{ext}" #{dbname})
+          command %(psql -h #{node[:postgresql][:data_run]} -p #{params[:port]} -c "DROP EXTENSION IF EXISTS #{ext}" #{dbname})
           user "postgres"
         end
       end
