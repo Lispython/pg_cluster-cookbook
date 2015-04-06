@@ -98,7 +98,10 @@ local       all         all                             md5
 <% end %>
 
 <% if @standby['ips'] %>
-<% @standby.ips.each do |ip| %>
-host        replication all         <%= ip -%>/32       trust
+#host        replication all         ip_address/32       trust
+<% @standby.ips.each do |h| %>
+<%= "#{(h[:type] || "host").ljust(8)} #{(h[:database] || "replication").ljust(16)} #{(h[:user] || "all").ljust(16)} #{h[:address].ljust(24)} #{h[:method] || "trust"}"%>
 <% end %>
 <% end %>
+
+# host    replication     rep     IP_address_of_slave/32   md5

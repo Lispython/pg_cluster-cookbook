@@ -66,6 +66,10 @@ define :pg_cluster,
     end
   end
 
+  if config[:archive_command] == true
+    config[:archive_command] = "cp %p #{data_dir}/archive/%f"
+  end
+
   case node['platform']
   when "ubuntu"
     case
@@ -154,21 +158,22 @@ echo "ALTER ROLE postgres ENCRYPTED PASSWORD '#{params[:config][:password][:post
   end
 
 
-#   if standby[:allow]
-#     # This goes in the data directory; where data is stored
-#     node_name = standby[:node_name]
-#     master_ip = standby[:master_ip]
-#     template "#{data_dir}/recovery.conf" do
-#       source "recovery.conf.erb"
-#       owner "postgres"
-#       group "postgres"
-#       mode 0600
-#       variables(
-#                 :primary_conninfo => "host=#{master_ip} application_name=#{node_name}",
-#                 :trigger_file => "#{data_dir}")
-#     notifies :restart, resources(:service => "postgresql")
-#     end
-#   end
+  if standby[:allow]
+    # This goes in the data directory; where data is stored
+    trigger_file = "#{data_dir}/trigger.#{params[:port]}"
+    template "#{data_dir}/recovery.conf" do
+      source "recovery.conf.erb"
+      owner "postgres"
+      group "postgres"
+      mode 0640
+      variables(
+                :primary_conninfo => "host=#{params[:standby][:ip]} user=#{params[:standby][:user]} port=#{params[:port]}sslmode=prefer sslcompression=1",# password=#{params[:standby][:password]}",
+                :trigger_file => "#{trigger_file}",
+                :data_dir => "#{data_dir}"
+                )
+    notifies :restart, "service[postgresql-#{version}]", :immediately
+    end
+  end
 
   template start_file do
     source "pg_start.conf.erb"

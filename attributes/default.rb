@@ -47,7 +47,7 @@ default[:postgresql]["lc"] = {}
 default[:postgresql]["config"] = {
   "connection" => {
     "max_connections" => 100,
-    "listen_addresses" => "localhost"
+    "listen_addresses" => "127.0.0.1"
   },
   "authentication" => {
 #    "ssl" => "true",

@@ -51,6 +51,7 @@ node["postgresql"]["clusters"].each() do |cluster_config|
         password user['password']
         superuser user['superuser']
         create_role user['create_role']
+        replication user['replication']
         create_db user['create_db']
         encrypted user['encrypted']
         host cluster_config["host"]

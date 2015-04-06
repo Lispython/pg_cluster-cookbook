@@ -17,6 +17,7 @@ define :pg_user,
        :create_role => false,
        :encrypted => false,
        :password => "password",
+       :replication => nil,
        :host => nil,
        :port => nil do
 
@@ -28,6 +29,7 @@ define :pg_user,
   user_options.push(params[:create_db] ? '--createdb' : '--no-createdb')
   user_options.push(params[:create_role] ? '--createrole' : '--no-createrole')
   user_options.push(params[:encrypted] ? '--encrypted' : '--unencrypted')
+  user_options.push(params[:replication] ? "--replication": '--no-replication')
 
   user_command = begin
                    "createuser -h #{node[:postgresql][:data_run]} -p #{port} #{user_options.join(' ')} #{username};"
