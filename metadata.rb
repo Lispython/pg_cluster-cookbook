@@ -6,13 +6,13 @@ description       "Installs and configures postgresql for clients or servers"
 long_description  IO.read(File.join(File.dirname(__FILE__), 'README.md'))
 
 version           "1.0.3"
-recipe            "pg_cluster", "Includes postgresql::client"
-recipe            "pg_cluster::apt_postgresql_ppa ", "Includes ubuntu sources for PostgreSQL 9.1"
-recipe            "pg_cluster::client", "Installs postgresql client package(s)"
-recipe            "pg_cluster::server", "Installs postgresql server packages, templates"
-recipe            "pg_cluster::server_redhat", "Installs postgresql server packages, redhat family style"
-recipe            "pg_cluster::server_debian", "Installs postgresql server packages, debian family style"
-recipe            "pg_cluster::setup", "Create users/databases from data bags"
+recipe            "postgresql", "Includes postgresql::client"
+recipe            "postgresql::apt_postgresql_ppa ", "Includes ubuntu sources for PostgreSQL 9.1"
+recipe            "postgresql::client", "Installs postgresql client package(s)"
+recipe            "postgresql::server", "Installs postgresql server packages, templates"
+recipe            "postgresql::server_redhat", "Installs postgresql server packages, redhat family style"
+recipe            "postgresql::server_debian", "Installs postgresql server packages, debian family style"
+recipe            "postgresql::setup", "Create users/databases from data bags"
 
 %w{ ubuntu debian fedora suse }.each do |os|
   supports os
