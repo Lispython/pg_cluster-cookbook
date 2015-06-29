@@ -1,4 +1,4 @@
-name              "pg_cluster"
+name              "postgresql"
 maintainer        "Opscode, Inc."
 maintainer_email  "cookbooks@opscode.com"
 license           "Apache 2.0"
