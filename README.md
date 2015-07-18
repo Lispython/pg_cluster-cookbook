@@ -9,6 +9,7 @@ Features:
 * Postgresql installation from apt.postgresql.org
 * Users creating
 * Replication
+* Extensions
 
 
 Requirements
@@ -149,7 +150,28 @@ Example:
         locale "ru_RU.UTF-8"
         host "/var/run/postgresql"
         port 5333 # Cluster port
-   end
+    end
+
+### pg_database_extensions
+
+Manage database extensions and languages
+
+#### Attributes
+
+- ``languages`` - set language
+- ``extensions`` - set used extensions
+- ``postgis`` - use postgis?
+- ``port`` - cluster port
+
+Example:
+
+    pg_database_extensions "mydb" do
+      languages "plpgsql"              # install `plpgsql` language - single value may be passed without array
+      extensions ["hstore", "dblink"]  # install `hstore` and `dblink` extensions - multiple values in array
+      postgis true                     # install `postgis` support
+      port 5333 # Cluster port
+    end
+
 
 
 Resources/Providers
@@ -217,7 +239,7 @@ Database creation:
         locale "ru_RU.UTF-8"
         host "/var/run/postgresql"
         port 5333 # Cluster port
-   end
+    end
 
 
 If you include ``recipe[postgresql::server]`` and ``recipe[postgresql::setup``
